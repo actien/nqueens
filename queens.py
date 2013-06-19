@@ -7,6 +7,9 @@ class Position:
         self.y = y
     def __str__(self):
         return "({}, {})".format(self.x, self.y)
+    def compare(self, other_position):
+        assert isinstance(other_position, Position)
+        return self.x == other_position.x and self.y == other_position.y
 
 class Board:
     def __init__(self, n):
@@ -18,6 +21,13 @@ class Board:
 
         self.queens_left = n
         self.size = n
+    def _placeQueen(valid_positions, queen_position, boardsize):
+        #Given the list of valid positions, the position we want to place the queen, 
+        #and the boardsize, return a new list of positions that would be invalidated
+        pass
+        
+    def solve(self):
+        print "Solving n-queens problem"
 
 
 if __name__ == "__main__":
