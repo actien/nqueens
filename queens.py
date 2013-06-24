@@ -154,6 +154,14 @@ def placeYQueen(valid_positions, boardsize):
 
 def solve(n):
     """ Takes a number n and generates solutions. """
+    # Generate all initial positions
+
+    # Generate initial starting position to place
+    
+    # Only call place X Queen
+    # Only call place Y queen
+    # Mark how many times either function returns successfully
+    # 
     pass
         
 
