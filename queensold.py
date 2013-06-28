@@ -3,10 +3,6 @@
 import copy, sys
 
 class Position:
-    """ Position class to represent a position on the board.
-        TODO: There might be a better way to do the 'compare' function, look into 
-              python libs
-    """
     def __init__(self, x,y):
         self.x = x
         self.y = y
@@ -31,10 +27,9 @@ def validatePosition(boardsize, pos):
 
 def generateQueenAttacks(boardsize, pos):
     """ Generates a list of all positions that the Queen can attack.
-        Alternatively it may be good to use the elegant diagonal summation/difference
-        checks.
     """
     assert isinstance(pos, Position) and validatePosition(boardsize, pos)
+    #pos = (x, y)
     attackList = []
     startPos = Position(pos.x, pos.y)
     
@@ -107,10 +102,6 @@ def generateQueenAttacks(boardsize, pos):
     return attackList
 
 def isInList(valid_positions, pos):
-    """ Tests whether pos is in valid_positions using the compare function
-        in the Position class. This allows us to set two different objects 
-        equal. If it is, return the position pointer. Otherwise, return False.
-    """
     assert isinstance(pos, Position)
     for position in valid_positions:
         if pos.compare(position):
@@ -118,10 +109,6 @@ def isInList(valid_positions, pos):
     return False
 
 def placeQueen(valid_positions, pos, boardsize):
-    """ Tries to place a queen in the position that is passed. Calls isInList
-        to help it decide. Returns True if the queen was successfully place, False
-        otherwise.
-    """
     if isInList(valid_positions, pos): #IS a valid position!
         invalid_positions = generateQueenAttacks(boardsize, pos)
         #update valid_positions
@@ -134,34 +121,41 @@ def placeQueen(valid_positions, pos, boardsize):
             
 
 def recursiveQueen(row, validList, queensLeft, boardsize, sol_stack):
-    """ Solve the N-queens problem recursively. Saves board state via deep copying
-        the list of valid positions. Also maintains a solution stack that is passed
-        to recursed instances of this function; the solution stack is used to keep
-        track of the positions being considered as a solution to the n-queens problem.
-    """
-    #Internal helper functions
+    #print "============"
+    #print "Currently on row {}".format(row)
+    #print "Valid list is: {}".format(validList)
+    #print "Queens left: {}".format(queensLeft)
+
+    #assumption: in each version of the function, we will leave it making 
+    #sure we have popped everything we pushed
+    
+    #clean up after myself.
     def cleanup(pushed):
         for i in range(0,pushed):
             sol_stack.pop()
     def print_solution():
-        printingList = sol_stack[-1*boardsize:] #slice for last 5 solutions
+        printingList = copy.deepcopy(sol_stack)
+        printingList.reverse()
         print ", ".join(str(printingList[i]) for i in range(0, boardsize))
+            
 
-    #Are we even on the board? Do we even have squares left to test?
     if row > boardsize:
         return False
     elif len(validList) == 0:
         return False
 
-    #Save board state 
+    #make deep copy of validList to pass
     copiedList = copy.deepcopy(validList)
     pushed = 0
     for col in range(0, boardsize):
+        #print col
+        #sys.stdout.write("considering: {} ".format(Position(row, col)))
         if placeQueen(copiedList, Position(row, col), boardsize):
             sol_stack.append(Position(row,col))
             pushed += 1
             queensLeft = queensLeft - 1
-            if queensLeft == 0: 
+            #sys.stdout.write("placed. {} queens left.\n".format(queensLeft))
+            if queensLeft == 0: #solution!
                 print "Solution:"
                 print_solution()
                 cleanup(pushed)
@@ -173,44 +167,62 @@ def recursiveQueen(row, validList, queensLeft, boardsize, sol_stack):
                     queensLeft += 1
                     pushed -= 1
                     sol_stack.pop()
+        else:
+            #sys.stdout.write("...failed.\n")
+            pass
+   
     # do we still have leftovers? clean them up
     cleanup(pushed)
     return False
         
+
+    # row = which row we're in
+    # the current position we are considering is: (row, col)
+
+    # base cases: position checks out. is in valid list.
+    # Compute new valid list for this version. Then:
+    #   -> call recursiveQueen if queensLeft > 0 (recursive call). decrement queensLeft by 1, pass a new validList, and my row+1
+    #   -> if queensLeft == 0, we just placed our last queen! We have a solution. add it to a solutions list.
+    # If we reach end of col loop (meaning there are no valid positions in this row), return to our caller.
+    #
+
 def solve(n):
-    """ 'Main' function, makes the board, and then calls recursiveQueen.
-    """
     originalboard = makeBoard(n)
+    #print "Boardsize: {}".format(originalboard)
     recursiveQueen(0, originalboard, n, n, [])
     
-def basic_tests():
-    print "Make Board testing"
-    positions = makeBoard(4)
-    for pos in positions:
-        print pos
-
-    print "Basic position testing"
-    pa = Position(1,1)
-    pb = Position(2,2)
-    pc = Position(1,1)
-    pd = pa
-    print "pa == pc: {}".format(pa == pc)
-    print "pa == pb: {}".format(pa == pb)
-    print "pa == pd: {}".format(pa == pd)
-    pa.x += 1
-    print pa
-    
-    print "generating Queen attacks test"
-    for pos in generateQueenAttacks(4, Position(0,0)):
-        print pos
-
-    print "placeQueen test"
-    placeQueen(positions, Position(0,0), 4)
-    for pos in positions:
-        print pos
     
     
 if __name__ == "__main__":
+##    print "Basic board testing"
+##    #board = Board(1)
+##    #board.solve()
+##    #board = Board(4)
+##    #board.solve()
+##    board = makeBoard(4)
+##    for square in board:
+##        print square
+##
+##    print "Basic position testing"
+##    pa = Position(1,1)
+##    pb = Position(2,2)
+##    pc = Position(1,1)
+##    pd = pa
+##    print "pa == pc: {}".format(pa == pc)
+##    print "pa == pb: {}".format(pa == pb)
+##    print "pa == pd: {}".format(pa == pd)
+##    pa.x += 1
+##    print pa
+####    
+##    print "Generating Queen attacks"
+##    #for pos in generateQueenAttacks(4, Position(0,0)):
+##     #   print pos
+##    positions = makeBoard(4)
+##    for pos in positions:
+##        print pos
+##    placeQueen(positions, Position(0,0), 4)
+##    for pos in positions:
+##        print pos
+####
+##    print "Recursivequeen call"
     solve(int(sys.argv[1]))
-# tests: uncomment to run
-#    basic_tests()
