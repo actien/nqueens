@@ -131,7 +131,16 @@ def placeQueen(valid_positions, pos, boardsize):
                 valid_positions.remove(temp)
         return True
     return False
-            
+
+def fancyprint(solutions_list, boardsize):
+    for i in range(0, boardsize):
+        for j in range(0, boardsize):
+            if isInList(solutions_list, Position(i,j)):
+                sys.stdout.write("Q")
+            else:
+                sys.stdout.write("#")
+        sys.stdout.write("\n")
+
 
 def recursiveQueen(row, validList, queensLeft, boardsize, sol_stack):
     """ Solve the N-queens problem recursively. Saves board state via deep copying
@@ -146,6 +155,7 @@ def recursiveQueen(row, validList, queensLeft, boardsize, sol_stack):
     def print_solution():
         printingList = sol_stack[-1*boardsize:] #slice for last 5 solutions
         print ", ".join(str(printingList[i]) for i in range(0, boardsize))
+        fancyprint(printingList, boardsize)
 
     #Are we even on the board? Do we even have squares left to test?
     if row > boardsize:
